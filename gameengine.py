@@ -1,4 +1,5 @@
-from sys import int_info
+# pip install PyOpenGL PyOpenGL_accelerate pygame
+
 from typing import Any, Callable
 import pygame
 from utils import debug_log, GAME_WRAPPER
@@ -9,7 +10,7 @@ clock:                  pygame.time.Clock = None
 fps:                    int = FPS_MAX_DEFAULT
 callbacks_set:          bool = False
 opengl:                 bool = FLAGS & pygame.OPENGL # if opengl is enabled
-clear_color:            tuple[int, int, int_info] = CLEAR_COLOR
+clear_color:            tuple[int, int, int] = CLEAR_COLOR
 
 startup_callback:       list[Callable] = None
 pre_update_callback:    list[Callable] = None
@@ -33,6 +34,10 @@ def set_clear_color(color: tuple[int, int, int]):
         glClearColor(*[c/255 for c in color], 1)
 
     clear_color = color
+
+def quit_game():
+    event = pygame.event.Event(pygame.QUIT)
+    pygame.event.post(event)
 
 def set_callbacks(
         startup: list[Callable],
@@ -77,10 +82,7 @@ def start_game():
 
     debug_log(GAME_WRAPPER, "Pygame initialized")
 
-    _run()
-
-# runs the game
-def _run():
+    # game statup
     _startup()
     debug_log(GAME_WRAPPER, "Startup functions done")
 
@@ -89,34 +91,31 @@ def _run():
     while True:
         delta_time = clock.tick(fps)
 
-        redraw = _pre_update()
-
-        if _handle_events(): # if the game should close
+        _pre_update()
+        if _handle_events(): # if the game should closes
             break
+        _update(delta_time)
 
-        redraw = _update(delta_time) or redraw
+        _draw()
 
-        if redraw:
-            _draw()
+        # create fps counter if enabled
+        if FPS_COUNTER:
+            # rgba for opengl support
+            text_surface = pygame.font.SysFont(None, 20).render(f"FPS: {int(clock.get_fps()):3d}", True, (255, 255, 255, 255))
+            if opengl:
+                # convert surface to opengl texture
+                text_surface = text_surface.convert_alpha()
+                text_data = pygame.image.tostring(text_surface, "RGBA", True)
 
-            # create fps counter if enabled
-            if FPS_COUNTER:
-                # rgba for opengl support
-                text_surface = pygame.font.SysFont(None, 20).render(f"FPS: {int(clock.get_fps()):3d}", True, (255, 255, 255, 255))
-                if opengl:
-                    # convert surface to opengl texture
-                    text_surface = text_surface.convert_alpha()
-                    text_data = pygame.image.tostring(text_surface, "RGBA", True)
+                # draw texture in top left corner, calculate position as openl coordinates start in the bottom left corner
+                w, h = pygame.display.get_surface().get_size()
+                tw, th = text_surface.get_size()
+                glWindowPos2d(0, h-th)
+                glDrawPixels(tw, th, GL_RGBA, GL_UNSIGNED_BYTE, text_data)
+            else:
+                pygame.display.get_surface().blit(text_surface, (0, 0))
 
-                    # draw texture in top left corner, calculate position as openl coordinates start in the bottom left corner
-                    w, h = pygame.display.get_surface().get_size()
-                    tw, th = text_surface.get_size()
-                    glWindowPos2d(0, h-th)
-                    glDrawPixels(tw, th, GL_RGBA, GL_UNSIGNED_BYTE, text_data)
-                else:
-                    pygame.display.get_surface().blit(text_surface, (0, 0))
-
-            pygame.display.flip()
+        pygame.display.flip()
 
     _cleanup()
     debug_log(GAME_WRAPPER, "Cleanup functions dones")
@@ -125,28 +124,29 @@ def _run():
     debug_log(GAME_WRAPPER, "Pygame closed")
     quit()
 
-# return True if the screen should be redrawn
-def _redraw_callbacks(callbacks: list[Callable], *args: Any) -> bool:
-    redraw = False
-    for callback in callbacks:
-        redraw = callback(*args) or redraw
-    return redraw
-
-# updates before event handling and update
-def _pre_update() -> bool:
-    return _redraw_callbacks(pre_update_callback)
-
-# updates after event handling
-def _update(delta_time: float) -> bool:   
-    return _redraw_callbacks(update_callback, delta_time)
-
 # runs all callbacks
 def _callbacks(callbacks: list[Callable], *args: Any):
     for callback in callbacks:
         callback(*args)
 
-# return True if the game should closes
-def _handle_events() -> bool:
+# updates before event handling and update
+def _pre_update() -> bool:
+    return _callbacks(pre_update_callback)
+
+# updates after event handling
+def _update(delta_time: float) -> bool:   
+    return _callbacks(update_callback, delta_time)
+
+# runs all startup callbacks
+def _startup():
+    _callbacks(startup_callback)
+
+# runs all cleanup callbacks
+def _cleanup():
+    _callbacks(cleanup_callback)
+
+# returns true if the game should close
+def _handle_events() -> int:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             return True
@@ -163,11 +163,3 @@ def _draw():
     else:
         pygame.display.get_surface().fill(clear_color)
     _callbacks(draw_callback)
-
-# runs all startup callbacks
-def _startup():
-    _callbacks(startup_callback)
-
-# runs all cleanup callbacks
-def _cleanup():
-    _callbacks(cleanup_callback)
