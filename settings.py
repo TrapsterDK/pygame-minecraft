@@ -23,4 +23,4 @@ FLAGS = RESIZABLE | OPENGL
 FPS_COUNTER = True
 
 # Default clear color
-CLEAR_COLOR = (0, 0, 0)
+CLEAR_COLOR = (173, 216, 230) #light blue

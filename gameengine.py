@@ -10,7 +10,7 @@ clock:                  pygame.time.Clock = None
 fps:                    int = FPS_MAX_DEFAULT
 callbacks_set:          bool = False
 opengl:                 bool = FLAGS & pygame.OPENGL # if opengl is enabled
-clear_color:            tuple[int, int, int] = CLEAR_COLOR
+clear_color:            tuple[int, int, int] = None
 
 startup_callback:       list[Callable] = None
 pre_update_callback:    list[Callable] = None
@@ -77,6 +77,9 @@ def start_game():
 
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+    # set clear color, must be set after opengl is enabled
+    set_clear_color(CLEAR_COLOR)
 
     clock = pygame.time.Clock()
 
