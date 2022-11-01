@@ -1,18 +1,83 @@
 import pygame
 from OpenGL.GL import *
 
-#https://learnopengl.com/Getting-started/Camera
-cubeVertices = ((1,1,1),(1,1,-1),(1,-1,-1),(1,-1,1),(-1,1,1),(-1,-1,-1),(-1,-1,1),(-1, 1,-1))
-cubeQuads = ((0,3,6,4),(2,5,6,3),(1,2,5,7),(1,0,4,7),(7,4,6,5),(2,3,0,1))
-side_color = ((1,0,0), (0,1,0), (0,0,1), (1,1,0), (1,0,1), (0,1,1))
+cube_vertices = (
+    (1, -1, -1),
+    (1, 1, -1),
+    (-1, 1, -1),
+    (-1, -1, -1),
+    (1, -1, 1),
+    (1, 1, 1),
+    (-1, -1, 1),
+    (-1, 1, 1)
+)
 
-def solidCube():
+cube_edges = (
+    (0, 1),
+    (0, 3),
+    (0, 4),
+    (2, 1),
+    (2, 3),
+    (2, 7),
+    (6, 3),
+    (6, 4),
+    (6, 7),
+    (5, 1),
+    (5, 4),
+    (5, 7)
+)
+
+cube_quads = (
+    (0, 1, 2, 3),
+    (3, 2, 7, 6),
+    (6, 7, 5, 4),
+    (4, 5, 1, 0),
+    (1, 5, 7, 2),
+    (4, 0, 3, 6)
+)
+
+side_color = (
+    (1, 0, 0),
+    (0, 1, 0),
+    (0, 0, 1),
+    (1, 1, 0),
+    (1, 0, 1),
+    (0, 1, 1)
+)
+
+uv_coords = (
+    (0, 0),
+    (0, 1),
+    (1, 1),
+    (1, 0)
+)
+
+def cube():
     glBegin(GL_QUADS)
-    for color, cubeQuad in zip(side_color, cubeQuads):
-        glColor3fv(color)
-        for cubeVertex in cubeQuad:
-            glVertex3fv(cubeVertices[cubeVertex])
+    glColor3f(0, 0, 0)
+    for cube_quad in cube_quads:
+        for vertex in cube_quad:
+            glVertex3fv(cube_vertices[vertex])
     glEnd()
+
+def colored_cube():
+    glBegin(GL_QUADS)
+    for i in range(6):
+        glColor3fv(side_color[i])
+        for vertex in cube_quads[i]:
+            glVertex3fv(cube_vertices[vertex])
+    glEnd()
+
+def grid_cube():
+    glBegin(GL_LINES)
+    glColor3f(1, 1, 1)
+    for edge in cube_edges:
+        for vertex in edge:
+            glVertex3fv(cube_vertices[vertex])
+    glEnd()
+
+cube_display = 0
+cube_drawing_functions = [colored_cube, grid_cube, cube]
 
 # Statup runs once at the start of the game
 def startup():
@@ -21,24 +86,17 @@ def startup():
     # enable smooth shading
     glShadeModel(GL_SMOOTH)
 
-# Pre update runs before event handling and update
-def pre_update():
-    pass
-
-# Update runs after event handling
-# Takes delta time since last frame as argument
-def update(delta_time):
-    pass
-
 # Event handling
 def handle_event(event):
-    pass
+    global cube_display
+    # key down
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_q:
+            if cube_display <= 0:
+                cube_display = len(cube_drawing_functions)
+            cube_display -= 1
+            
 
 # Draw runs after updates
 def draw():
-    solidCube()
-    pass
-
-# Cleanup runs once at the end of the game
-def cleanup():
-    pass
+    cube_drawing_functions[cube_display]()
