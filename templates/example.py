@@ -8,16 +8,16 @@ def startup():
 def pre_update():
     pass
 
-# Update runs after event handling, return true to redraw the screen
+# Update runs after event handling
 # Takes delta time since last frame as argument
 def update(delta_time):
-    return True
+    pass
 
-# Event handling, return true to close the game
+# Event handling
 def handle_event(event):
-    return False
+    pass
 
-# Draw runs after update if update or pre update returned true
+# Draw runs after updates
 def draw():
     pass
 
