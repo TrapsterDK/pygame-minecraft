@@ -17,7 +17,10 @@ SCREEN_SIZE_DEFAULT = (800, 600)
 FPS_MAX_DEFAULT = 60
 
 # Flags for pygame.display.set_mode, already includes DOUBLEBUF
-FLAGS = RESIZABLE
+FLAGS = RESIZABLE | OPENGL
 
 # Weather to display fps in left top corner
 FPS_COUNTER = True
+
+# Default clear color
+CLEAR_COLOR = (0, 0, 0)

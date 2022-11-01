@@ -1,5 +1,5 @@
 from importer import load_functions
-from gamewrapper import start_game, set_callbacks
+from gameengine import start_game, set_callbacks
 
 def run():
     functions = load_functions()
