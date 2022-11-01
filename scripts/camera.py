@@ -3,10 +3,10 @@ import pyrr
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import math
-from gameengine import quit_game
 
 # https://learnopengl.com/Getting-started/Camera
 
+# camera position
 camera_pos =    pyrr.Vector3([0.0, 0.0, 5.0])
 camera_front =  pyrr.Vector3([0.0, 0.0, -1.0])
 camera_up =     pyrr.Vector3([0.0, 1.0, 0.0])
@@ -20,15 +20,19 @@ camera_speed = 0.1
 def mouse_movement(event):
     global yaw, pitch, camera_front
 
+    # get mouse movement
     x, y = event.rel
     x *= sensitivity
     y = -y * sensitivity
 
+    # update yaw and pitch
     yaw += x
     pitch += y
 
+    # limit pitch
     pitch = max(min(pitch, 89.0), -89.0)
 
+    # update camera front
     front = pyrr.Vector3([
         math.cos(math.radians(yaw)) * math.cos(math.radians(pitch)),
         math.sin(math.radians(pitch)),
@@ -41,14 +45,19 @@ def key_movement():
     global camera_pos, camera_front, camera_up, camera_speed
 
     keys = pygame.key.get_pressed()
+    # forward, backward
     if keys[pygame.K_w]:
         camera_pos += camera_front * camera_speed
     if keys[pygame.K_s]:
         camera_pos -= camera_front * camera_speed
+
+    # left, right
     if keys[pygame.K_a]:
         camera_pos -= pyrr.vector.normalise(pyrr.vector3.cross(camera_front, camera_up)) * camera_speed
     if keys[pygame.K_d]:
         camera_pos += pyrr.vector.normalise(pyrr.vector3.cross(camera_front, camera_up)) * camera_speed
+    
+    # up and down
     if keys[pygame.K_SPACE]:
         camera_pos += camera_up * camera_speed
     if keys[pygame.K_LSHIFT]:
@@ -78,9 +87,5 @@ def update(delta_time):
 
 # Event handling
 def handle_event(event):
-    if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_ESCAPE:
-            quit_game()
-
     if event.type == pygame.MOUSEMOTION:
         mouse_movement(event)
