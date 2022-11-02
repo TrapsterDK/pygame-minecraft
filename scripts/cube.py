@@ -36,6 +36,13 @@ cube_quads = (
     (4, 0, 3, 6)
 )
 
+cube_uv = (
+    (0, 0),
+    (0, 1),
+    (1, 1),
+    (1, 0)
+)
+
 side_color = (
     (1, 0, 0),
     (0, 1, 0),
@@ -80,66 +87,26 @@ def load_texture(filename):
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data)
     return texture
+    
+#https://stackoverflow.com/questions/39194862/opengl-how-do-i-apply-a-texture-to-this-cube
+
 
 def texture_cube():
     grid_cube()
     glColor3fv((1, 1, 1))
     # enable textures
     glEnable(GL_TEXTURE_2D)
-    # bind texture
-    load_texture("test.png")
-    glBegin(GL_QUADS)
-
-    glTexCoord2f(0.0, 0.0)
-    glVertex3f(-1.0, -1.0,  1.0)
-    glTexCoord2f(1.0, 0.0)
-    glVertex3f(1.0, -1.0,  1.0)
-    glTexCoord2f(1.0, 1.0)
-    glVertex3f(1.0,  1.0,  1.0)
-    glTexCoord2f(0.0, 1.0)
-    glVertex3f(-1.0,  1.0,  1.0)
-    glTexCoord2f(1.0, 0.0)
-    glVertex3f(-1.0, -1.0, -1.0)
-    glTexCoord2f(1.0, 1.0)
-    glVertex3f(-1.0,  1.0, -1.0)
-    glTexCoord2f(0.0, 1.0)
-    glVertex3f(1.0,  1.0, -1.0)
-    glTexCoord2f(0.0, 0.0)
-    glVertex3f(1.0, -1.0, -1.0)
-    glTexCoord2f(0.0, 1.0)
-    glVertex3f(-1.0,  1.0, -1.0)
-    glTexCoord2f(0.0, 0.0)
-    glVertex3f(-1.0,  1.0,  1.0)
-    glTexCoord2f(1.0, 0.0)
-    glVertex3f(1.0,  1.0,  1.0)
-    glTexCoord2f(1.0, 1.0)
-    glVertex3f(1.0,  1.0, -1.0)
-    glTexCoord2f(1.0, 1.0)
-    glVertex3f(-1.0, -1.0, -1.0)
-    glTexCoord2f(0.0, 1.0)
-    glVertex3f(1.0, -1.0, -1.0)
-    glTexCoord2f(0.0, 0.0)
-    glVertex3f(1.0, -1.0,  1.0)
-    glTexCoord2f(1.0, 0.0)
-    glVertex3f(-1.0, -1.0,  1.0)
-    glTexCoord2f(1.0, 0.0)
-    glVertex3f(1.0, -1.0, -1.0)
-    glTexCoord2f(1.0, 1.0)
-    glVertex3f(1.0,  1.0, -1.0)
-    glTexCoord2f(0.0, 1.0)
-    glVertex3f(1.0,  1.0,  1.0)
-    glTexCoord2f(0.0, 0.0)
-    glVertex3f(1.0, -1.0,  1.0)
-    glTexCoord2f(0.0, 0.0)
-    glVertex3f(-1.0, -1.0, -1.0)
-    glTexCoord2f(1.0, 0.0)
-    glVertex3f(-1.0, -1.0,  1.0)
-    glTexCoord2f(1.0, 1.0)
-    glVertex3f(-1.0,  1.0,  1.0)
-    glTexCoord2f(0.0, 1.0)
-    glVertex3f(-1.0,  1.0, -1.0)
     
-    glEnd()
+
+    for i in range(6):
+        load_texture(f"test{i}.png")
+        # bind texture
+        glBegin(GL_QUADS)
+        for j, vertex in enumerate(cube_quads[i]):
+            glTexCoord2fv(cube_uv[j])
+            glVertex3fv(cube_vertices[vertex])
+
+        glEnd()
 
     # disable textures
     glDisable(GL_TEXTURE_2D)
