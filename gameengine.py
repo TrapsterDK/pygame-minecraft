@@ -42,7 +42,7 @@ def start_game() -> None:
     modules = _import_scripts()
 
     # check if module should be ignored
-    for module in modules:
+    for module in reversed(modules):
         if hasattr(module, IGNORE_MODULE):
             # check if set to ignore
             if getattr(module, IGNORE_MODULE):
