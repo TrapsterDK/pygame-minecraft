@@ -15,3 +15,6 @@ CLEAR_COLOR = (0, 0, 0) #(173, 216, 230) #light blue
 
 # Shader files
 SHADER_FOLDER = 'shaders'
+
+# Texture files
+TEXTURE_FOLDER = 'textures'

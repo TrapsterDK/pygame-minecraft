@@ -3,10 +3,13 @@ import pygame
 import pathlib
 import importlib
 from types import ModuleType
-from settings import SCREEN_SIZE_DEFAULT, FPS_MAX_DEFAULT, SCRIPTS_FOLDER, GAME_TITLE, CLEAR_COLOR, SHADER_FOLDER
+from settings import SCREEN_SIZE_DEFAULT, FPS_MAX_DEFAULT, SCRIPTS_FOLDER, GAME_TITLE, CLEAR_COLOR, SHADER_FOLDER, TEXTURE_FOLDER
 import moderngl
+from PIL import Image
+
 
 IGNORE_MODULE = 'IGNORE_MODULE'
+
 
 max_fps:        int = FPS_MAX_DEFAULT
 callbacks_set:  bool = False
@@ -14,30 +17,58 @@ clear_color:    tuple[float, float, float] = None
 gl_context:     moderngl.Context = None
 clock:          pygame.time.Clock = None
 
+
+# loads single texture in rgba format
+def load_texture(path: str) -> moderngl.Texture:
+    # load image as rgba
+    image = Image.open(f'{TEXTURE_FOLDER}/{path}').convert('RGBA')
+
+    # flip for opengl
+    image = image.transpose(Image.FLIP_TOP_BOTTOM)
+
+    # create texture
+    texture = gl_context.texture(image.size, 4, image.tobytes())
+
+    return texture
+
+
+# load vertex and fragment shader into program
 def get_shader(shader_name: str) -> moderngl.Program:
     return gl_context.program(
         vertex_shader = open(f"{SHADER_FOLDER}/{shader_name}.vs").read(),
         fragment_shader = open(f"{SHADER_FOLDER}/{shader_name}.fs").read()
     )
 
+
+# get gl context
 def get_gl_context() -> moderngl.Context:
     return gl_context
 
+
+# get pygame clock
 def get_clock() -> pygame.time.Clock:
     return clock
 
+
+# set max fps
 def set_max_fps(new_fps: int) -> None:
     global max_fps
     max_fps = new_fps
 
+
+# set clear color
 def set_clear_color(color: tuple[int, int, int]) -> None:
     global clear_color
     clear_color = (*[c/255 for c in color], 1)
 
+
+# post quit game event
 def quit_game() -> None:
     event = pygame.event.Event(pygame.QUIT)
     pygame.event.post(event)
 
+
+# start game
 def start_game() -> None:
     global gl_context, clock
     
