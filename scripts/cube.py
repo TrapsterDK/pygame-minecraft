@@ -45,13 +45,6 @@ side_color = (
     (0, 1, 1)
 )
 
-uv_coords = (
-    (0, 0),
-    (0, 1),
-    (1, 1),
-    (1, 0)
-)
-
 def cube():
     glBegin(GL_QUADS)
     glColor3f(0, 0, 0)
@@ -76,8 +69,83 @@ def grid_cube():
             glVertex3fv(cube_vertices[vertex])
     glEnd()
 
-cube_display = 0
-cube_drawing_functions = [colored_cube, grid_cube, cube]
+def load_texture(filename):
+    image = pygame.image.load(filename)
+    image = pygame.transform.flip(image, False, True)
+    image_data = pygame.image.tostring(image, "RGBA", True)
+    width, height = image.get_size()
+    texture = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D, texture)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data)
+    return texture
+
+def texture_cube():
+    grid_cube()
+    glColor3fv((1, 1, 1))
+    # enable textures
+    glEnable(GL_TEXTURE_2D)
+    # bind texture
+    load_texture("test.png")
+    glBegin(GL_QUADS)
+
+    glTexCoord2f(0.0, 0.0)
+    glVertex3f(-1.0, -1.0,  1.0)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f(1.0, -1.0,  1.0)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3f(1.0,  1.0,  1.0)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3f(-1.0,  1.0,  1.0)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f(-1.0, -1.0, -1.0)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3f(-1.0,  1.0, -1.0)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3f(1.0,  1.0, -1.0)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3f(1.0, -1.0, -1.0)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3f(-1.0,  1.0, -1.0)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3f(-1.0,  1.0,  1.0)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f(1.0,  1.0,  1.0)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3f(1.0,  1.0, -1.0)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3f(-1.0, -1.0, -1.0)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3f(1.0, -1.0, -1.0)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3f(1.0, -1.0,  1.0)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f(-1.0, -1.0,  1.0)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f(1.0, -1.0, -1.0)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3f(1.0,  1.0, -1.0)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3f(1.0,  1.0,  1.0)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3f(1.0, -1.0,  1.0)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3f(-1.0, -1.0, -1.0)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f(-1.0, -1.0,  1.0)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3f(-1.0,  1.0,  1.0)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3f(-1.0,  1.0, -1.0)
+    
+    glEnd()
+
+    # disable textures
+    glDisable(GL_TEXTURE_2D)
+
+cube_drawing_functions = [colored_cube, grid_cube, cube, texture_cube]
+cube_display = len(cube_drawing_functions) - 1
 
 # Statup runs once at the start of the game
 def startup():
