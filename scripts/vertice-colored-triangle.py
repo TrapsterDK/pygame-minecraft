@@ -1,6 +1,8 @@
 from gameengine import get_gl_context
 from array import array
 
+IGNORE_MODULE = 1
+
 vertices = [ 
     -0.5, -0.5,   1.0, 0.0, 0.0, # bottom left, s red
      0.5, -0.5,   0.0, 1.0, 0.0, # buttom right, blue
