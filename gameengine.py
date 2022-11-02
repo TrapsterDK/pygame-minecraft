@@ -3,7 +3,7 @@ import pygame
 import pathlib
 import importlib
 from types import ModuleType
-from settings import SCREEN_SIZE_DEFAULT, FPS_MAX_DEFAULT, SCRIPTS_FOLDER, GAME_TITLE, CLEAR_COLOR
+from settings import SCREEN_SIZE_DEFAULT, FPS_MAX_DEFAULT, SCRIPTS_FOLDER, GAME_TITLE, CLEAR_COLOR, SHADER_FOLDER
 import moderngl
 
 IGNORE_MODULE = 'IGNORE_MODULE'
@@ -13,6 +13,12 @@ callbacks_set:  bool = False
 clear_color:    tuple[float, float, float] = None
 gl_context:     moderngl.Context = None
 clock:          pygame.time.Clock = None
+
+def get_shader(shader_name: str) -> moderngl.Program:
+    return gl_context.program(
+        vertex_shader = open(f"{SHADER_FOLDER}/{shader_name}.vs").read(),
+        fragment_shader = open(f"{SHADER_FOLDER}/{shader_name}.fs").read()
+    )
 
 def get_gl_context() -> moderngl.Context:
     return gl_context

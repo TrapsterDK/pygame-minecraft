@@ -12,3 +12,6 @@ FPS_MAX_DEFAULT = 60
 
 # Default clear color
 CLEAR_COLOR = (0, 0, 0) #(173, 216, 230) #light blue
+
+# Shader files
+SHADER_FOLDER = 'shaders'
