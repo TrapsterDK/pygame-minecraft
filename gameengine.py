@@ -69,21 +69,26 @@ def quit_game() -> None:
 
 
 # start game
-def start_game() -> None:
+def start_game(specific_module: str = None) -> None:
     global gl_context, clock
     
     # set clear color
     set_clear_color(CLEAR_COLOR)
 
-    # get all scripts
-    modules = _import_scripts()
+    # load all scripts
+    if specific_module is None:
+        modules = _import_scripts()
+        
+        # check if module should be ignored
+        for module in reversed(modules):
+            if hasattr(module, IGNORE_MODULE):
+                # check if set to ignore
+                if getattr(module, IGNORE_MODULE):
+                    modules.remove(module)
 
-    # check if module should be ignored
-    for module in reversed(modules):
-        if hasattr(module, IGNORE_MODULE):
-            # check if set to ignore
-            if getattr(module, IGNORE_MODULE):
-                modules.remove(module)
+    # load specific script
+    else:
+        modules = [importlib.import_module(f"{SCRIPTS_FOLDER}.{specific_module}")]
 
     # get callbacks
     startup_callback = _get_modules_function(modules, 'startup')
