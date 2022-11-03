@@ -99,7 +99,7 @@ def start_game(specific_module: str = None) -> None:
             
     pygame.init()
     pygame.display.set_caption(GAME_TITLE)
-    screen = pygame.display.set_mode(SCREEN_SIZE_DEFAULT, pygame.DOUBLEBUF | pygame.OPENGL)#| pygame.RESIZABLE
+    screen = pygame.display.set_mode(SCREEN_SIZE_DEFAULT, pygame.DOUBLEBUF | pygame.OPENGL | pygame.RESIZABLE)
 
     # moderngl
     pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
